@@ -1,21 +1,14 @@
-# Getting Started
+# quartz 스케줄러
 
-### Reference Documentation
-For further reference, please consider the following sections:
+### 시스템 구조
+<img width="634" alt="structure" src="https://user-images.githubusercontent.com/40568894/94233289-9fac1200-ff42-11ea-9f96-521867668041.PNG">
 
-* [Official Gradle documentation](https://docs.gradle.org)
-* [Spring Boot Gradle Plugin Reference Guide](https://docs.spring.io/spring-boot/docs/2.3.4.RELEASE/gradle-plugin/reference/html/)
-* [Create an OCI image](https://docs.spring.io/spring-boot/docs/2.3.4.RELEASE/gradle-plugin/reference/html/#build-image)
-* [Spring Data JPA](https://docs.spring.io/spring-boot/docs/2.3.4.RELEASE/reference/htmlsingle/#boot-features-jpa-and-spring-data)
+## 사용 기술
+* spring-boot 2.x
+* spring-quartz
+* jdbcTemplate
+* redisTemplate
 
-### Guides
-The following guides illustrate how to use some features concretely:
-
-* [Accessing Data with JPA](https://spring.io/guides/gs/accessing-data-jpa/)
-* [Accessing data with MySQL](https://spring.io/guides/gs/accessing-data-mysql/)
-
-### Additional Links
-These additional references should also help you:
-
-* [Gradle Build Scans – insights for your project's build](https://scans.gradle.com#gradle)
+### 역할
+* 5분마다 mysql의 best10 상품 원본 데이터를 조회하여 레디스에 캐싱된 데이터 업데이트
 
