@@ -2,8 +2,10 @@ package com.quartzscheduler;
 
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
+import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
+@EnableJpaAuditing // JPA Auditing 활성화
 @EnableScheduling   // 스케줄러 사용
 @SpringBootApplication
 public class Application {

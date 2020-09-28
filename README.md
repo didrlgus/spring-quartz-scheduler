@@ -6,9 +6,9 @@
 ## 사용 기술
 * spring-boot 2.x
 * spring-quartz
-* jdbcTemplate
+* spring-data-jpa
 * redisTemplate
 
 ### 역할
-* 5분마다 mysql의 best10 상품 원본 데이터를 조회하여 레디스에 캐싱된 데이터 업데이트
+* 5분마다 mysql의 best10, new8 상품 원본 데이터를 조회하여 레디스에 캐싱된 데이터 업데이트
 
