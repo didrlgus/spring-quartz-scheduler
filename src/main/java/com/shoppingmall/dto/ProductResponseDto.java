@@ -19,5 +19,7 @@ public class ProductResponseDto implements Serializable {
         private Integer disPrice;
         private Integer salePrice;
         private Integer rateAvg;
+        private Long timestamp;
+        private Integer purchaseCnt;
     }
 }

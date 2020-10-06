@@ -12,18 +12,20 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.core.ValueOperations;
+import org.springframework.data.redis.core.ZSetOperations;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@Slf4j
-public class Best10ProductCachingJob implements Job {
+import static java.util.Objects.nonNull;
 
-    private final static String BEST10_PRODUCT_KEY = "redis-cache:best10ProductList";
-    private final static String NEW8_PRODUCT_KEY = "redis-cache:new8ProductList";
+@Slf4j
+public class BestAndNewProductCachingJob implements Job {
+
+    private final static String BEST10_PRODUCT_KEY = "best10ProductList";
+    private final static String NEW8_PRODUCT_KEY = "new8ProductList";
 
     /**
      * 일정 주기마다 실행되는 메서드
@@ -38,12 +40,43 @@ public class Best10ProductCachingJob implements Job {
         setCaching(applicationContext, best10ProductList, new8ProductList);
     }
 
-    public void setCaching(ApplicationContext applicationContext, Object bestProduct, Object newProduct) {
+    public void setCaching(ApplicationContext applicationContext,
+                           List<ProductResponseDto.MainProductResponseDto> bestProducts,
+                           List<ProductResponseDto.MainProductResponseDto> newProducts) {
         RedisTemplate<String, Object> redisTemplate = getRedisTemplate(applicationContext);
+        ZSetOperations<String, Object> zop = redisTemplate.opsForZSet();
 
-        ValueOperations<String, Object> vop = redisTemplate.opsForValue();
-        vop.set(BEST10_PRODUCT_KEY, bestProduct);
-        vop.set(NEW8_PRODUCT_KEY, newProduct);
+        // 인기 상품 셋팅
+        setBest10Products(zop, bestProducts);
+
+        // 최신 상품 셋팅
+        setNew8Products(zop, newProducts);
+    }
+
+    public void setBest10Products(ZSetOperations<String, Object> zop,
+                                  List<ProductResponseDto.MainProductResponseDto> bestProducts) {
+        Long bestProductsCnt = zop.zCard(BEST10_PRODUCT_KEY);
+
+        if(nonNull(bestProductsCnt)) {
+            zop.removeRange(BEST10_PRODUCT_KEY, 0, bestProductsCnt);
+        }
+
+        for(ProductResponseDto.MainProductResponseDto dto : bestProducts) {
+            zop.add(BEST10_PRODUCT_KEY, dto, Double.valueOf(dto.getPurchaseCnt()));
+        }
+    }
+
+    public void setNew8Products(ZSetOperations<String, Object> zop,
+                                List<ProductResponseDto.MainProductResponseDto> newProducts) {
+        Long newProductsCnt = zop.zCard(NEW8_PRODUCT_KEY);
+
+        if(nonNull(newProductsCnt)) {
+            zop.removeRange(NEW8_PRODUCT_KEY, 0, newProductsCnt);
+        }
+
+        for(ProductResponseDto.MainProductResponseDto dto : newProducts) {
+            zop.add(NEW8_PRODUCT_KEY, dto, Double.valueOf(dto.getTimestamp()));
+        }
     }
 
     public List<ProductResponseDto.MainProductResponseDto> getBest10ProductList(ApplicationContext applicationContext) {
@@ -103,6 +136,7 @@ public class Best10ProductCachingJob implements Job {
         return applicationContext.getBean("productRepository", ProductRepository.class);
     }
 
+    @SuppressWarnings("unchecked")
     public RedisTemplate<String, Object> getRedisTemplate(ApplicationContext applicationContext) {
         return applicationContext.getBean("redisQuartzTemplate", RedisTemplate.class);
     }

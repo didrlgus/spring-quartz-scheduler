@@ -1,6 +1,6 @@
 package com.quartzscheduler.config;
 
-import com.quartzscheduler.scheduler.Best10ProductCachingJob;
+import com.quartzscheduler.scheduler.BestAndNewProductCachingJob;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.context.annotation.Bean;
@@ -24,7 +24,7 @@ public class QuartzConfig {
     @Bean
     public JobDetailFactoryBean jobDetailFactoryBean() {
         JobDetailFactoryBean factory = new JobDetailFactoryBean();
-        factory.setJobClass(Best10ProductCachingJob.class);
+        factory.setJobClass(BestAndNewProductCachingJob.class);
 
         return factory;
     }
